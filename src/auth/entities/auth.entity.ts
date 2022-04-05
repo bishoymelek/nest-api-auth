@@ -1,11 +1,12 @@
 import { IsString, IsEmail, IsNotEmpty } from 'class-validator';
-import { Field, ObjectType } from 'type-graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
 
-@ObjectType()
+@ObjectType('Auth')
 export class AuthType {
   @Field()
   @IsEmail()
   email: string;
+
   @Field()
   @IsString()
   @IsNotEmpty()

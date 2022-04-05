@@ -7,10 +7,10 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../types/user';
-import { CreateUserInput } from './dto/user.input';
 import * as bcrypt from 'bcrypt';
+import { CreateUserArgs } from './dto/create-user.dto';
 import { UpdateUserInput } from './dto/update-user.input';
-import { UserType } from '../models/user.type';
+import { UserType } from './entities/user.entity';
 import { UserRoles } from '../shared/user-roles';
 
 @Injectable()
@@ -39,7 +39,7 @@ export class UserService {
     return await createdUser.save();
   }
 
-  async findByLogin(userDTO: CreateUserInput) {
+  async findByLogin(userDTO: CreateUserArgs) {
     const { email, password } = userDTO;
     const user = await this.userModel.findOne({ email });
     if (!user) {
@@ -83,7 +83,7 @@ export class UserService {
     else if (role === undefined || role === null) user.userRole;
     else userRole = user.userRole;
 
-    const updateUser: CreateUserInput = {
+    const updateUser: CreateUserArgs = {
       email: newUser.email || user.email,
       password: newUser.password || user.password,
       userRole: userRole,
