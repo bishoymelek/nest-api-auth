@@ -1,14 +1,13 @@
 import { Resolver, Query, Args, Mutation } from '@nestjs/graphql';
 import { UseGuards, UnauthorizedException } from '@nestjs/common';
+import { User } from './entities/user.entity';
 import { UserService } from './user.service';
-import { UpdateUserInput } from './dto/update-user.input';
-import { CurrentUser } from '../decorators/user.decorator';
-import { User } from '../types/user';
-import { UserType } from './entities/user.entity';
-import { UserRoles } from '../shared/user-roles';
+import { CurrentUser } from '../auth/decorators/user.decorator';
+import { UserRoles } from '../auth/entities/user-roles';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { GraphqlAuthGuard } from '../auth/guards/gql-auth.guard';
-// import { Roles } from '../decorators/roles.decorator';
+import { UpdateUserInput } from './dto/update-user.input';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @UseGuards(GraphqlAuthGuard)
 @UseGuards(RolesGuard)
@@ -16,18 +15,19 @@ import { GraphqlAuthGuard } from '../auth/guards/gql-auth.guard';
 export class UserResolver {
   constructor(private userService: UserService) {}
 
-  // @Roles("Admin")
-  @Query((returns) => [UserType])
+  @Roles(UserRoles.ADMIN)
+  @Query(() => [User])
   async users(): Promise<User[]> {
     return await this.userService.showAll();
   }
 
-  @Query((returns) => UserType)
+  @Query(() => User)
   async user(@Args('email') email: string): Promise<User> {
     return await this.userService.getUser(email);
   }
 
-  @Mutation((returns) => UserType)
+  @Roles(UserRoles.ADMIN)
+  @Mutation(() => User)
   async delete(
     @Args('email') email: string,
     @CurrentUser() user: User,
@@ -40,14 +40,18 @@ export class UserResolver {
     }
   }
 
-  @Mutation((returns) => UserType)
+  @Roles(UserRoles.NORMAL)
+  @Mutation(() => User)
   async update(
-    @Args('id') id: string,
     @Args('user') user: UpdateUserInput,
-    @CurrentUser() currentUser: User,
+    @CurrentUser() currentUser: any,
   ): Promise<User> {
-    if (id === currentUser.id || currentUser.userRole === UserRoles.ADMIN) {
-      return await this.userService.update(id, user, currentUser.userRole);
+    if (currentUser.userRole === UserRoles.NORMAL) {
+      return await this.userService.update(
+        currentUser._id,
+        user,
+        currentUser.userRole,
+      );
     } else {
       throw new UnauthorizedException();
     }

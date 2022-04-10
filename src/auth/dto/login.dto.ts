@@ -1,12 +1,10 @@
-import { MinLength } from 'class-validator';
-import { Field, ArgsType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 
-@ArgsType()
+@InputType()
 export class LoginUserArgs {
-  @Field({ nullable: true })
+  @Field()
   email: string;
 
-  @Field({ nullable: true })
-  @MinLength(3)
+  @Field()
   password: string;
 }

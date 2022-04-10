@@ -1,6 +1,6 @@
 import { IsEmail, IsString, IsOptional } from 'class-validator';
 import { InputType, Field } from '@nestjs/graphql';
-import { UserRoles } from '../../shared/user-roles';
+import { UserRoles } from '../../auth/entities/user-roles';
 
 @InputType()
 export class UpdateUserInput {

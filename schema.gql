@@ -21,7 +21,7 @@ type Query {
 type Mutation {
   delete(email: String!): User!
   update(user: UpdateUserInput!): User!
-  register(RegisterUserInput: RegisterUserArgs!): Auth!
+  register(RegisterUserInput: CreateUserArgs!): Auth!
   login(LoginUserInput: LoginUserArgs!): Auth!
 }
 
@@ -31,7 +31,7 @@ input UpdateUserInput {
   userRole: String
 }
 
-input RegisterUserArgs {
+input CreateUserArgs {
   email: String!
   password: String!
   userRole: String
