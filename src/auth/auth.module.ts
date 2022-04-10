@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { EmailScalar } from '../scalars/email.scalar';
 
 @Module({
   imports: [
@@ -13,6 +12,6 @@ import { EmailScalar } from '../scalars/email.scalar';
       defaultStrategy: 'jwt',
     }),
   ],
-  providers: [AuthResolver, AuthService, JwtStrategy, EmailScalar],
+  providers: [AuthResolver, AuthService, JwtStrategy],
 })
 export class AuthModule {}

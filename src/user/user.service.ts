@@ -6,30 +6,28 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../types/user';
-import { CreateUserInput } from './dto/user.input';
 import * as bcrypt from 'bcrypt';
+import { User } from './entities/user.entity';
+import { CreateUserArgs } from './dto/create-user.dto';
 import { UpdateUserInput } from './dto/update-user.input';
-import { UserType } from '../models/user.type';
-import { UserRoles } from '../shared/user-roles';
+import { UserRoles } from '../auth/entities/user-roles';
+import { LoginUserArgs } from 'auth/dto/login.dto';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel('User') private readonly userModel: Model<UserType>,
-  ) {}
+  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
   async showAll(): Promise<User[]> {
     return await this.userModel.find();
   }
 
-  async getUser(email: string): Promise<UserType> {
+  async getUser(email: string): Promise<User> {
     return await this.userModel.findOne({
       email,
     });
   }
 
-  async create(userDTO: User): Promise<UserType> {
+  async create(userDTO: User): Promise<User> {
     const { email } = userDTO;
     const user = await this.userModel.findOne({ email });
     if (user) {
@@ -39,8 +37,9 @@ export class UserService {
     return await createdUser.save();
   }
 
-  async findByLogin(userDTO: CreateUserInput) {
+  async findByLogin(userDTO: LoginUserArgs) {
     const { email, password } = userDTO;
+
     const user = await this.userModel.findOne({ email });
     if (!user) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
@@ -83,7 +82,7 @@ export class UserService {
     else if (role === undefined || role === null) user.userRole;
     else userRole = user.userRole;
 
-    const updateUser: CreateUserInput = {
+    const updateUser: CreateUserArgs = {
       email: newUser.email || user.email,
       password: newUser.password || user.password,
       userRole: userRole,

@@ -1,25 +1,26 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
+import { ApolloDriver } from '@nestjs/apollo';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
-import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import 'dotenv/config';
-import { APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
+import { MongooseModule } from '@nestjs/mongoose';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
 
 const host = process.env.DATABASE_HOST || 'localhost';
+const isDev = process.env.STAGE?.toLowerCase() === 'dev';
+
 @Module({
   imports: [
     GraphQLModule.forRoot({
-      typePaths: ['./**/*.graphql'],
-      context: ({ req }) => ({ req }),
-      playground: true,
-      resolverValidationOptions: {
-        requireResolversForResolveType: false,
-      },
+      driver: ApolloDriver,
+      playground: isDev,
+      debug: isDev,
+      autoSchemaFile: join(process.cwd(), './schema.gql'),
+      // context: ({ req }) => ({ req }),
     }),
-    MongooseModule.forRoot(`mongodb://${host}/nest`),
+    MongooseModule.forRoot(`mongodb://${host}/nest-exam`),
     UserModule,
     AuthModule,
   ],
@@ -28,10 +29,6 @@ const host = process.env.DATABASE_HOST || 'localhost';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
     },
   ],
 })

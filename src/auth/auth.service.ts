@@ -1,17 +1,19 @@
+import { sign } from 'jsonwebtoken';
 import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { Payload } from 'src/types/payload';
-import { sign } from 'jsonwebtoken';
+import { TokenPayload } from 'auth/dto/token-payload.dto';
 
 @Injectable()
 export class AuthService {
   constructor(private userService: UserService) {}
 
-  async signPayload(payload: Payload) {
-    return sign(payload, 'secretKey', { expiresIn: '12h' });
+  async signPayload(payload: TokenPayload) {
+    return sign(payload, process.env.SECRET_KEY || 'secretKey', {
+      expiresIn: '12h',
+    });
   }
 
-  async validateUser(payload: Payload) {
+  async validateUser(payload: TokenPayload) {
     return await this.userService.findByPayload(payload);
   }
 }
