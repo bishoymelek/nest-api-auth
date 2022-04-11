@@ -30,6 +30,7 @@ export class UserService {
   async create(userDTO: User): Promise<User> {
     const { email } = userDTO;
     const user = await this.userModel.findOne({ email });
+
     if (user) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
     }
@@ -42,7 +43,7 @@ export class UserService {
 
     const user = await this.userModel.findOne({ email });
     if (!user) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
     }
 
     if (await bcrypt.compare(password, user.password)) {

@@ -20,15 +20,17 @@ export class AuthResolver {
     const { email, password } = args;
 
     const user: User = { email, password, userRole: UserRoles.NORMAL };
+
     try {
-      const response: User = await this.userService.create(user);
+      const createdUser: User = await this.userService.create(user);
+
       const tokenPayload: TokenPayload = {
-        email: response.email,
-        role: response.userRole,
+        email: createdUser.email,
+        role: createdUser.userRole,
       };
 
       const token = await this.authService.signPayload(tokenPayload);
-      return { email: response.email, token };
+      return { email: createdUser.email, token };
     } catch (exception) {
       throw exception;
     }
