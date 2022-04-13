@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { User } from './entities/user.entity';
+import { User, UserDocument } from './entities/user.entity';
 import { CreateUserArgs } from './dto/create-user.dto';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UserRoles } from '../auth/entities/user-roles';
@@ -15,7 +15,9 @@ import { LoginUserArgs } from 'auth/dto/login.dto';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+  ) {}
 
   async showAll(): Promise<User[]> {
     return await this.userModel.find();

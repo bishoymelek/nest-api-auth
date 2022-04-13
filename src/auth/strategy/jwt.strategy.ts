@@ -12,6 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  // TODO: change the type
   async validate(payload: any, done: VerifiedCallback) {
     const user = await this.authService.validateUser(payload);
 
